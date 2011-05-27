@@ -1,0 +1,53 @@
+<!doctype html> 
+<html> 
+    <head> 
+        <title>Calculator</title> 
+        <link type="text/css" rel="stylesheet" href="style.css">
+ 
+        <script src="jquery-1.4.4.min.js"></script> 
+        <script src="jquery-linedtextarea.js"></script> 
+        <script src="jquery.mousewheel.min.js"></script> 
+        <script src="http://jashkenas.github.com/coffee-script/extras/coffee-script.js"></script>
+ 
+        <script src="calc.coffee" type="text/coffeescript"></script> 
+ 
+        <script type="text/javascript"> 
+            $(document).ready(function() {
+                init();
+                document.getElementById("caalc").focus();
+            });
+        </script> 
+    </head> 
+    <body> 
+        <div id="header"> 
+            <a  class="logo" href="index.html"></a> 
+            <a class="logo inactive-logo converter" href="converter.html"></a> 
+            <div id="menu"> 
+                <a class="highlight" href="http://rustam.li">suggest a feature</a> 
+                <a href="help.html">help</a> 
+                <a href="about.html">about</a> 
+                <a href="share.html">share</a> 
+            </div> 
+        </div> 
+        <div id="input-box"> 
+            <span id="inp_l"></span><input id="caalc" value="0" onclick="this.select()" /><span id="inp_r"></span> 
+            <div id="wrench"></div> 
+        </div> 
+        <div id="input-buttons"></div> 
+ 
+        <div id="output-box"> 
+            <textarea onchange="updateHistory()" id="output"></textarea> 
+            <span id="scroll-down"></span> 
+            <span id="clean" onclick="cleanOutput()">Clean</span> 
+        </div> 
+ 
+        <div id="func-box"> 
+            <h2>Custom Functions <span id="closeFuncEdit">&#215;</span></h2> 
+            <textarea onchange="updateHistory()" id="func-edit"></textarea> 
+        </div> 
+ 
+        <div id="help"> 
+            &copy; 2011 <a class="action" target="_blank" href="http://rustam.li">Turan Rustamli</a> 
+        </div> 
+    </body> 
+</html> 

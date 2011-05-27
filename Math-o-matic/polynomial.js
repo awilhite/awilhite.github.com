@@ -647,9 +647,6 @@ Polynomial.prototype.zeros = function (verbose, composite) {
                         dz0 = dz;
                         dz = changedirection(dz, r0 / r);
                         r = dz.abs(); // HVE 2009-04-14 to avoid overflow
-                        if (verbose) {
-                            ss += print_dz("\tdz>5*dz0 =>Alter direction:", dz0, dz);
-                        }
                     }
                     r0 = r * 5.0;
                 }
@@ -664,12 +661,6 @@ Polynomial.prototype.zeros = function (verbose, composite) {
                     z = Complex.sub(z0, dz);
                     fz = p.value(z);
                     ff = f = fz.norm();
-                    if (verbose) {
-                        ss += print_iteration("\tNewton Step: ", z, dz, f, true);
-                    }
-                    if (verbose && stage1 == true) {
-                        ss += "\tFunction value " + (f > f0 ? "increase=>try shorten the step" : "decrease=>try multiple steps in that direction") + "\n";
-                    }
 
                     if (stage1 == true) {
                         wz = z;
@@ -683,21 +674,12 @@ Polynomial.prototype.zeros = function (verbose, composite) {
                             }
                             fwz = p.value(wz);
                             fw = fwz.norm();
-                            if (verbose) {
-                                ss += print_iteration("\tTry Step: ", wz, dz, fw, true);
-                            }
                             if (fw >= f) {
-                                if (verbose) {
-                                    ss += "\t        : No improvement=>Discard last try step\n";
-                                }
                                 break;
                             }
                             f = fw;
                             fz = fwz;
                             z = wz;
-                            if (verbose) {
-                                ss += "\t        : Improved=>Continue stepping\n";
-                            }
                             if (div2 == true && i == 2) {
                                 dz = changedirection(dz, 0.5);
                                 z = Complex.sub(z0, dz);
@@ -1019,11 +1001,11 @@ function parsePolynomial(arg) {
             }
             input[input.length] = r[0];
             fi = re.lastIndex;
-        } {
-            var a;
-            a = arg.slice(fi);
-            if ((a = a.replace(/\s+/g, "")).length != 0) input[input.length] = a;
         }
+        var a;
+        a = arg.slice(fi);
+        if ((a = a.replace(/\s+/g, "")).length != 0) input[input.length] = a;
+
         return input;
     }
 

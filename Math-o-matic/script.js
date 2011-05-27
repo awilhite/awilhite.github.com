@@ -59,18 +59,32 @@ function Factors() {
 }
 
 function Quadratic() {
+	
+	var quadratic = /^(\-?\d*)[a-z]{1}\^2([+\-]{1}\-?\d*)[a-z]{1}([+\-]{1}\-?\d*)$/i;
+    
+    var input = $("form[name='poly'] input[type='text']")[0];
 
-var a = $("form[name='quad'] input[type='text']")[0].value,
-    b = $("form[name='quad'] input[type='text']")[1].value,
-    c = $("form[name='quad'] input[type='text']")[2].value,
-    discriminant = (b * b) - (4 * a * c),
-    sq,
-    plus,
-	go = false;
+	str.replace(polynomial, "$1, $2, $3")
 
+	var input = $("form[name='quadratic'] input[type='text']")[0];
+    var discriminant = (b * b) - (4 * a * c);
+    var sq;
+    var plus;
+	var go = true;	
+	var a, b, c;
 
-    if (a !== "" && b !== "" && c !== "") {
-        go = true;
+    if (!polynomial.test(input.value)) {
+        go = false;
+        input.style.border = "1px solid red";
+    }
+    else {
+    	input.value.replace(polynomial, function (str, p1, p2, p3) {
+			a = p1;
+			b = p2;
+			c = p3;
+            return str;
+		});
+		input.style.border = "1px solid green";
     }
 
     if (discriminant > 0 && go === true) {
@@ -100,9 +114,7 @@ var a = $("form[name='quad'] input[type='text']")[0].value,
     }
 }
 
-function Polynomial() {	
-	
-	var coefficients = $("form[name='poly'] input[type='text']")[0].value.split(" ");
+function Polynomial() {		
 
 	console.log(coefficients);
 	
