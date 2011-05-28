@@ -3,16 +3,8 @@
 /*****************************************************************************************/
 var INIT_NAMES = ["3,4-dimethyl-1-octene.sdf"];
 
-var MENU_MAP = {
-"Caffeine"  :"caffeine.sdf"
-};
-
-var MENU_MAP_LO = {};
-for(var i in MENU_MAP)
-    if(MENU_MAP[i]) MENU_MAP_LO[i.toLowerCase()] = MENU_MAP[i];
-
-var PARS = {
-"default": {'draw_atoms'  :1,
+var parameters = {
+         'draw_atoms'  :1,
          'draw_bonds'     :1,
          'auto_x'         :1,
          'auto_y'         :1,
@@ -20,105 +12,11 @@ var PARS = {
          'bonds_autowidth':0,
          'bonds_gradient' :0,
          'atom_colors'    :1,
-         'glow'           :1,
-         'flat_shading'   :1,
+         'flat_shading'   :0,
+         'letters_shading':1,
          'sphere_shading' :0,
          'atom_radius'    :10
-        },
-"small": {'draw_atoms'    :1,
-         'draw_bonds'     :1,
-         'auto_x'         :1,
-         'auto_y'         :1,
-         'auto_z'         :0,
-         'bonds_autowidth':0,
-         'bonds_gradient' :0,
-         'atom_colors'    :1,
-         'glow'           :1,
-         'flat_shading'   :0,
-         'sphere_shading' :1,
-         'atom_radius'    :5
-        },
-"full": {'draw_atoms'     :1,
-         'draw_bonds'     :1,
-         'auto_x'         :1,
-         'auto_y'         :1,
-         'auto_z'         :0,
-         'bonds_autowidth':1,
-         'bonds_gradient' :1,
-         'atom_colors'    :1,
-         'glow'           :1,
-         'flat_shading'   :0,
-         'sphere_shading' :1,
-         'atom_radius'    :5
-        },
-"atoms":{'draw_atoms'     :1,
-         'draw_bonds'     :0,
-         'auto_x'         :1,
-         'auto_y'         :1,
-         'auto_z'         :0,
-         'bonds_autowidth':0,
-         'bonds_gradient' :0,
-         'atom_colors'    :1,
-         'glow'           :1,
-         'flat_shading'   :0,
-         'sphere_shading' :1,
-         'atom_radius'    :5
-        },
-"atoms2":{'draw_atoms'     :1,
-         'draw_bonds'     :0,
-         'auto_x'         :0,
-         'auto_y'         :0,
-         'auto_z'         :0,
-         'bonds_autowidth':0,
-         'bonds_gradient' :0,
-         'atom_colors'    :0,
-         'glow'           :0,
-         'flat_shading'   :1,
-         'sphere_shading' :0,
-         'atom_radius'    :5
-        },
-"bonds":{'draw_atoms'     :1,
-         'draw_bonds'     :1,
-         'auto_x'         :1,
-         'auto_y'         :1,
-         'auto_z'         :1,
-         'bonds_autowidth':0,
-         'bonds_gradient' :0,
-         'atom_colors'    :1,
-         'glow'           :1,
-         'flat_shading'   :0,
-         'letters_shading': 1,
-         'sphere_shading' :0,
-         'atom_radius'    :10
-        }
 };
-
-var PAR_MAP = {
-"2bbv"      :"atoms2",
-"adenovirus":"atoms2",
-"2GBL"      :"atoms2",
-"2OM3"      :"atoms2",
-"2X2C"      :"atoms2",
-"2GHO"      :"atoms2",
-"1OEI"      :"atoms2",
-"1L3W"      :"atoms2",
-"4TNA"      :"atoms",
-"dna"       :"small",
-"daptomycin":"small",
-'carotene'  :"small",
-'chlorophyll':"small",
-'cholesterol':"small",
-'oxytocin'  :"small",
-"3GBI"      :"atoms",
-"c60"       :"bonds",
-"graphite"  :"bonds",
-"diamond"   :"bonds",
-"nanotube"  :"bonds"
-};
-
-function get_type(name) {
-        return "default";
-}
 
 // default colors
 var BONDS_COLOR = [255,255,255];
@@ -173,26 +71,28 @@ function parse_sdf(text) {
     try {
         var lines = text.split("\n"); 
         
-        var natoms = parseInt(lines[3].substr(0,3));
-        var nbonds = parseInt(lines[3].substr(3,3));
+        var natoms = lines[3].substr(0,3).toInt();
+        var nbonds = lines[3].substr(3,3).toInt();
         
-        var x,y,z,e, first_bond = 4+natoms;
-        for (var i = 4; i < first_bond; ++i) {
-            x = parseFloat(lines[i].substr(0,10));
-            y = parseFloat(lines[i].substr(10,10));
-            z = parseFloat(lines[i].substr(20,10));
-            e = trim(lines[i].substr(30,5)).toLowerCase();
-            atoms.push([x,y,z, CPK[e], capitalize(e)]);
-            if(histogram[e]==undefined) histogram[e] = 1;
+        //minimum 4 bonds
+        var x, y, z, e, first_bond = 4 + natoms;
+        
+        for (var i = 4; i < first_bond; i++) {
+            x = lines[i].substr(0,10).toFloat();
+            y = lines[i].substr(10,10).toFloat();
+            z = lines[i].substr(20,10).toFloat();
+            e = lines[i].substr(30,5).trim().toLowerCase();
+            atoms.push( [ x, y, z, CPK[e], e.toTitleCase() ] );
+            if (histogram[e] === undefined) histogram[e] = 1;
             else histogram[e] += 1;
         }
         
         var start, end, n;
-        for(var i=first_bond; i<(first_bond+nbonds); ++i) {
-            start = parseInt(lines[i].substr(0,3));
-            end   = parseInt(lines[i].substr(3,3));
-            n     = parseInt(lines[i].substr(6,3));
-            bonds.push([start-1, end-1, n]);
+        for (var i = first_bond; i < (first_bond + nbonds); i++) {
+            start = lines[i].substr(0,3).toInt();
+            end   = lines[i].substr(3,3).toInt();
+            n     = lines[i].substr(6,3).toInt();
+            bonds.push( [start-1, end-1, n] );
         }
         
         return {"ok":1, "atoms":atoms, "bonds":bonds, "histogram":histogram };
@@ -208,8 +108,8 @@ function parse_sdf(text) {
 // Geometry
 /*****************************************************************************************/
 function clamp(val, min, max) {
-    if(val<min) return min;
-    if(val>max) return max;
+    if (val < min) return min;
+    if (val > max) return max;
     return val;
 }
 
@@ -282,7 +182,7 @@ function rotate(src, dst, angles) {
     cos = Math.cos(angles[2]);
     sin = Math.sin(angles[2]);
         
-    for(i=0; i<size; ++i) {
+    for(i = 0; i < size; i++) {
         a = dst[i][0] * cos - dst[i][1] * sin;
         b = dst[i][0] * sin + dst[i][1] * cos;
         dst[i][0] = a;
@@ -314,16 +214,7 @@ function line3d(ctx, x1,y1,z1, x2,y2,z2, scolor,ecolor, bonds_gradient) {
     ctx.moveTo(x1,y1);
     ctx.lineTo(x2,y2);
     ctx.closePath();
-    
-    if(bonds_gradient) {
-        var lingrad = ctx.createLinearGradient(x1,y1,x2,y2);
-        lingrad.addColorStop(0.0, scolor);
-        lingrad.addColorStop(1.0, ecolor);
-        ctx.strokeStyle = lingrad;
-    }
-    else {
-        ctx.strokeStyle = scolor;
-    }
+    ctx.strokeStyle = scolor;
     ctx.stroke();
 }
 
@@ -396,43 +287,6 @@ function render_molecule(ctx, cx, cy, width, height, points, lines, draw_atoms, 
                     ctx.fillStyle ='rgb('+r+','+g+','+b+')';
                     point3d(ctx, x, y, z, (0.5+col1/512)*atom_radius);
                 }
-                else if(sphere_shading) {
-                    half = (0.5+col1/512)*atom_radius;
-                    size = 2*half;
-                    grad = ctx.createRadialGradient(x-half+size*0.34,y-half+size*0.7,size*0.15, x,y,half);
-                    grad.addColorStop(0, 'rgb('+r+','+g+','+b+')');
-                    grad.addColorStop(0.95, 'rgba(0,0,0,1.0)');
-                    grad.addColorStop(1, 'rgba(0,0,0,0.0)');
-                    
-                    ctx.fillStyle = grad;
-                    
-                    // Safari doesn't handle well transparent part of the radial gradient
-                    // so it has to be clipped by circle shape.
-                    // Other browsers can just draw rectangle which is faster.
-                    if(IS_SAFARI)
-                        point3d(ctx, x, y, z, (0.5+col1/512)*atom_radius);
-                    else
-                        ctx.fillRect(x-half, y-half, size,size);
-                }
-                else {
-                    dx = atom_radius*1.5;
-                    
-                    // must invert circle and colors order for Opera
-                    if(IS_OPERA) {
-                        grad = ctx.createRadialGradient(x+dx, y+dx, 1, x,y,atom_radius);
-                        grad.addColorStop(0.0, 'rgb(0,0,0)');
-                        grad.addColorStop(1.0, 'rgb('+r+','+g+','+b+')');                                                
-                    }
-                    
-                    else {
-                        grad = ctx.createRadialGradient(x,y,atom_radius, x+dx, y+dx, 1);
-                        grad.addColorStop(0.0, 'rgb('+r+','+g+','+b+')');
-                        grad.addColorStop(1.0, 'rgb(0,0,0)');
-                    }
-
-                    ctx.fillStyle = grad;
-                    point3d(ctx, x, y, z, (0.5+col1/512)*atom_radius);
-                }
             }
         }
         
@@ -475,7 +329,7 @@ function render_molecule(ctx, cx, cy, width, height, points, lines, draw_atoms, 
             line3d(ctx, x1,y1,z1, x2,y2,z2,  c1,c2, bonds_gradient);
             
             // second and third bonds
-            if(elements[i][3]>1) {
+            if (elements[i][3] > 1) {
                 dd = 0.35*atom_radius;
                 fi = Math.atan2(dy, dx)-1.5;
                 dxx = dd*Math.cos(fi);
@@ -551,7 +405,7 @@ function Molecule(pars) {
     this.stats_count = 0;
     this.stats_total = 0;
     
-    this.stats_buf = new Array(MOVING_AVG_N);
+    this.stats_buf = [MOVING_AVG_N];
     this.stats_index = 0;
     
     this.time_start = 0;
@@ -563,7 +417,7 @@ function Molecule(pars) {
     this.destruct = function() {
         if(this.timeout_id>=0)
             clearTimeout(this.timeout_id);        
-    }
+    };
     
     this.render = function() {
         refresh_background(this.ctx, this.width, this.height, BACKGROUND_COLOR_RGB);
@@ -573,7 +427,7 @@ function Molecule(pars) {
                         this.atom_colors, this.atom_radius,
                         this.flat_shading, this.sphere_shading, this.letters_shading,
                         this.zback, this.zrange);
-    }
+    };
         
     this.reset_model = function() {        
         var bb = bbox(this.atoms);
@@ -820,13 +674,29 @@ function log(message, type) {
     console.log(message);
 }
 
-function trim(text) {
-    return text.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-}
+String.prototype.trim = function() {
+	
+    return this.replace(/^\s+/, '').replace(/\s+$/, '');
+    
+};
 
-function capitalize(text) {
-    return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
-}
+String.prototype.toTitleCase = function() {
+	
+    return this.charAt(0).toUpperCase() + this.substr(1).toLowerCase();
+
+};
+
+String.prototype.toInt = function() {
+	
+    return parseInt(this, 10);	
+	
+};
+
+String.prototype.toFloat = function() {
+
+    return parseFloat(this);
+	
+};
 
 function escape(txt) {
     return txt.replace(/ /g,"_");
@@ -882,10 +752,6 @@ function guess_type(text) {
 function generate_stats(natoms, nbonds) {
     return pretty_number(natoms)+" atom"+pluralize(natoms)+" "+pretty_number(nbonds)+" bond"+pluralize(nbonds);
 }
-    
-function create_permalink(txt) {
-    return '<a href="#'+escape(txt)+'">'+txt+'</a>';
-}
 
 function molecule_div(i) {
 	var width = $(window).width();
@@ -902,7 +768,7 @@ function add_molecule_canvas(label, name, text) {
     var mdiv = $(molecule_div(i));
     $("#molecules").append(mdiv);
         
-    var pars = PARS['bonds'];
+    var pars = parameters;
     pars['canvas_id'] = "screen"+i;
     pars['mdiv'] = mdiv;
 
@@ -961,12 +827,11 @@ $(document).ready(function(){
     
     CFInstall.check({
       mode: "overlay",
-      destination: "http://cloud9ide.com/awilhite/jscalc/workspace/molecule.html",
-      url: "http://www.google.com/chromeframe/eula.html?extra=devchannel&hl=en"
+      destination: "http://cloud9ide.com/awilhite/jscalc/workspace/molecule.html"
     });
     
         for(var i=0; i<INIT_NAMES.length; ++i) {
-            var label = capitalize(INIT_NAMES[i].substr(0, INIT_NAMES[i].length-4))
+            var label = INIT_NAMES[i].substr(0, INIT_NAMES[i].length-4).toTitleCase();
             window.molecule = add_molecule(label, INIT_NAMES[i]);
         }
         
