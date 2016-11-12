@@ -1,3 +1,5 @@
+window.hold = false;
+
 function log(desc, value)
 {
     var log_el = document.querySelector("#log");
@@ -8,31 +10,36 @@ function log(desc, value)
     log_el.innerHTML += "<br>";
 }
 
+function deviceOrientationHandler(event)
+{
+    log("Gamma", event.gamma);
+    log("Beta", event.beta);
+    log("Alpha", event.alpha);
+}
+
+function deviceMotionHandler(event)
+{
+    log("X", event.acceleration.x);
+    log("Y", event.acceleration.y);
+    log("Z", event.acceleration.z);
+}
+
 
 function initialize() {
-
-	var has_touch = 'ontouchstart' in document.documentElement;
-	var accX, accY, width, height, xA, yA, movement;
-	
-	if (has_touch) {
-		
-		window.ondevicemotion = function(event) {
-		  	
-		    accX = Math.round(event.accelerationIncludingGravity.x*10) / 10;  
-		    accY = Math.round(event.accelerationIncludingGravity.y*10) / 10;  
-		    
-		    movement = 10;
-		    
-		    xA = -(accX / 10) * movement;
-		    yA = -(accY / 10) * movement;
-            
-            log("xA", xA);
-            log("xA", yA);
-		    
-		}  
-		
-	}
-	
+    
+    window.setInterval(function(){
+        window.hold = !window.hold;
+    }, 1000);
+    
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+        log("Device Orientation", "Supported!");
+    }
+    
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', deviceMotionHandler);
+        log("Device Motion", "Supported!");
+    }
 }
 
 document.addEventListener('DOMContentLoaded', initialize);
