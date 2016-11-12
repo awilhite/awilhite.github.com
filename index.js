@@ -12,8 +12,10 @@ function log(desc, value)
 
 function deviceOrientationHandler(event)
 {
-    if (hold)
+    if (window.hold)
     {
+        window.hold = !window.hold;
+        
         log("Gamma", event.gamma);
         log("Beta", event.beta);
         log("Alpha", event.alpha);
@@ -22,8 +24,10 @@ function deviceOrientationHandler(event)
 
 function deviceMotionHandler(event)
 {
-    if (hold)
+    if (window.hold)
     {
+        window.hold = !window.hold;
+        
         log("X", event.acceleration.x);
         log("Y", event.acceleration.y);
         log("Z", event.acceleration.z);
@@ -35,7 +39,7 @@ function initialize() {
     
     window.setInterval(function(){
         window.hold = !window.hold;
-    }, 1000);
+    }, 100);
     
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', deviceOrientationHandler, false);
@@ -43,7 +47,7 @@ function initialize() {
     }
     
     if (window.DeviceMotionEvent) {
-        window.addEventListener('devicemotion', deviceMotionHandler);
+        window.addEventListener('devicemotion', deviceMotionHandler, false);
         log("Device Motion", "Supported!");
     }
 }
