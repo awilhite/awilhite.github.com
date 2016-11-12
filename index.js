@@ -1,4 +1,4 @@
-window.hold = false;
+window.hold = true;
 
 function log(desc, value)
 {
@@ -12,7 +12,7 @@ function log(desc, value)
 
 function deviceOrientationHandler(event)
 {
-    if (!hold)
+    if (hold)
     {
         log("Gamma", event.gamma);
         log("Beta", event.beta);
@@ -22,7 +22,7 @@ function deviceOrientationHandler(event)
 
 function deviceMotionHandler(event)
 {
-    if (!hold)
+    if (hold)
     {
         log("X", event.acceleration.x);
         log("Y", event.acceleration.y);
