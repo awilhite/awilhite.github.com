@@ -12,16 +12,22 @@ function log(desc, value)
 
 function deviceOrientationHandler(event)
 {
-    log("Gamma", event.gamma);
-    log("Beta", event.beta);
-    log("Alpha", event.alpha);
+    if (!hold)
+    {
+        log("Gamma", event.gamma);
+        log("Beta", event.beta);
+        log("Alpha", event.alpha);
+    }
 }
 
 function deviceMotionHandler(event)
 {
-    log("X", event.acceleration.x);
-    log("Y", event.acceleration.y);
-    log("Z", event.acceleration.z);
+    if (!hold)
+    {
+        log("X", event.acceleration.x);
+        log("Y", event.acceleration.y);
+        log("Z", event.acceleration.z);
+    }
 }
 
 
