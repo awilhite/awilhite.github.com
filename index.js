@@ -39,7 +39,7 @@ function initialize() {
     
     window.setInterval(function(){
         window.hold = !window.hold;
-    }, 100);
+    }, 1000);
     
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', deviceOrientationHandler, false);
